@@ -1,15 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-const generateCard = () => {
-  const cards = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11]; // Туз як 11
-  return cards[Math.floor(Math.random() * cards.length)];
+const createDeck = () => {
+  const deck = [];
+  const values = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11]; // 10: валет, дама, король
+  for (let i = 0; i < 4; i++) {
+    deck.push(...values);
+  }
+  return shuffle(deck);
+};
+
+const shuffle = (deck) => {
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+  return deck;
 };
 
 export const useBlackjack = () => {
-  const [playerCards, setPlayerCards] = useState([generateCard(), generateCard()]);
-  const [dealerCards, setDealerCards] = useState([generateCard()]);
+  const [deck, setDeck] = useState(createDeck());
+  const [playerCards, setPlayerCards] = useState([]);
+  const [dealerCards, setDealerCards] = useState([]);
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [result, setResult] = useState(null);
+
+  useEffect(() => {
+    const newDeck = [...deck];
+    const player = [newDeck.pop(), newDeck.pop()];
+    const dealer = [newDeck.pop()];
+    setPlayerCards(player);
+    setDealerCards(dealer);
+    setDeck(newDeck);
+  }, []);
 
   const getTotal = (cards) => {
     let sum = cards.reduce((a, b) => a + b, 0);
@@ -22,20 +44,27 @@ export const useBlackjack = () => {
   };
 
   const hit = () => {
-    const newCards = [...playerCards, generateCard()];
-    setPlayerCards(newCards);
-    if (getTotal(newCards) > 21) {
-      endGame(newCards, dealerCards);
+    if (!isPlayerTurn || result) return;
+    const newDeck = [...deck];
+    const newCard = newDeck.pop();
+    const newPlayerCards = [...playerCards, newCard];
+    setPlayerCards(newPlayerCards);
+    setDeck(newDeck);
+    if (getTotal(newPlayerCards) > 21) {
+      endGame(newPlayerCards, dealerCards);
     }
   };
 
   const stand = () => {
     setIsPlayerTurn(false);
+    let newDeck = [...deck];
     let dealerNewCards = [...dealerCards];
     while (getTotal(dealerNewCards) < 17) {
-      dealerNewCards.push(generateCard());
+      const card = newDeck.pop();
+      dealerNewCards.push(card);
     }
     setDealerCards(dealerNewCards);
+    setDeck(newDeck);
     endGame(playerCards, dealerNewCards);
   };
 

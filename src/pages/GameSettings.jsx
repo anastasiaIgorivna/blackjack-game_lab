@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -6,6 +5,7 @@ import * as yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 
 const schema = yup.object().shape({
+  userId: yup.string().required("Введіть ваше ім'я або ID"),
   difficulty: yup.string().required("Оберіть рівень складності"),
   speed: yup.number().min(1).max(10).required("Оберіть швидкість (1-10)"),
 });
@@ -23,7 +23,7 @@ function GameSettings() {
 
   const onSubmit = (data) => {
     localStorage.setItem('gameSettings', JSON.stringify(data));
-    navigate('/game');
+    navigate(`/game/${data.userId}`);
   };
 
   return (
@@ -31,6 +31,12 @@ function GameSettings() {
       <h2 className="text-2xl font-bold mb-4">Налаштування гри</h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div>
+          <label className="block mb-1 font-medium">Ім'я або ID користувача:</label>
+          <input {...register("userId")} className="border p-2 rounded w-full" />
+          {errors.userId && <p className="text-red-500">{errors.userId.message}</p>}
+        </div>
+
         <div>
           <label className="block mb-1 font-medium">Рівень складності:</label>
           <select {...register("difficulty")} className="border p-2 rounded w-full">
@@ -66,5 +72,6 @@ function GameSettings() {
 }
 
 export default GameSettings;
+
 
 
