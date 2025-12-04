@@ -1,9 +1,17 @@
-import React from 'react';
+
 import PlayerHand from '../components/PlayerHand';
 import DealerHand from '../components/DealerHand';
 import { useBlackjack } from '../hooks/useBlackjack';
+import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import GameOverModal from '../components/GameOverModal';
+
 
 function GamePage() {
+  const navigate = useNavigate();
+  const [settings, setSettings] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  
   const {
     playerCards,
     dealerCards,
@@ -13,10 +21,47 @@ function GamePage() {
     stand,
     getTotal,
   } = useBlackjack();
+  
+ 
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem('gameSettings'));
+    if (stored) {
+      setSettings(stored);
+      console.log('Отримані налаштування:', stored);
+    }
+  }, []);
 
+  
+  useEffect(() => {
+    if (result) {
+      setShowModal(true);
+    }
+  }, [result]);
+
+  const restartGame = () => {
+    window.location.reload(); 
+  };
+
+  const nextRound = () => {
+    setShowModal(false);
+  };
   return (
     <div className="p-4">
+      <button
+        className="mb-4 px-4 py-2 bg-gray-400 text-white rounded"
+        onClick={() => navigate('/settings')}
+      >
+        Налаштування
+      </button>
       <h2 className="text-2xl font-semibold mb-4">Гра Блекджек</h2>
+
+      {settings && (
+  <div className="mb-4">
+    <p>Рівень складності: {settings.difficulty}</p>
+    <p>Швидкість: {settings.speed}</p>
+  </div>
+)}
+
 
       <div className="mb-4">
         <h3 className="text-xl font-semibold">Карти дилера</h3>
@@ -48,6 +93,14 @@ function GamePage() {
           </div>
         )
       )}
+      
+    {showModal && (
+      <GameOverModal
+        result={result}
+        onRestart={restartGame}
+        onNext={nextRound}
+      />
+    )}
     </div>
   );
 }
