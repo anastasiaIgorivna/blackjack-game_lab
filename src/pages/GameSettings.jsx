@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setSettings } from '../store/settingsSlice';
 
 const schema = yup.object().shape({
   userId: yup.string().required("Введіть ваше ім'я або ID"),
@@ -12,6 +14,7 @@ const schema = yup.object().shape({
 
 function GameSettings() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const {
     register,
@@ -23,6 +26,7 @@ function GameSettings() {
 
   const onSubmit = (data) => {
     localStorage.setItem('gameSettings', JSON.stringify(data));
+    dispatch(setSettings(data));
     navigate(`/game/${data.userId}`);
   };
 
@@ -39,7 +43,7 @@ function GameSettings() {
 
         <div>
           <label className="block mb-1 font-medium">Рівень складності:</label>
-          <select {...register("difficulty")} className="border p-2 rounded w-full">
+          <select {...register("difficulty" )} className="border p-2 rounded w-full">
             <option value="">Оберіть</option>
             <option value="easy">Легкий</option>
             <option value="medium">Середній</option>
@@ -66,12 +70,23 @@ function GameSettings() {
         >
           Зберегти і почати гру
         </button>
+
+        <button
+          type="button"
+          onClick={() => navigate('/result')}
+          className="ml-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+        >
+          Переглянути результати
+        </button>
       </form>
     </div>
   );
 }
 
 export default GameSettings;
+
+
+
 
 
 
