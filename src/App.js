@@ -4,11 +4,14 @@ import GamePage from './pages/GamePage';
 import ResultPage from './pages/ResultPage';
 import GameSettings from './pages/GameSettings';
 import './App.css';
+import CookiePopup from "./components/CookiePopup";
 
 function App() {
   return (
+    
     <Router>
       <div className="container">
+      <CookiePopup />
         <Routes>
           <Route path="/" element={<StartPage />} />
           <Route path="/game/:userId" element={<GamePage />} />
