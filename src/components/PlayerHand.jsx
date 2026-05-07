@@ -1,12 +1,17 @@
-import React from 'react';
+import React from "react";
 
-function PlayerHand() {
+export default function PlayerHand({ cards }) {
   return (
-    <div className="mt-6">
-      <h3 className="text-xl font-semibold">Карти гравця</h3>
-      <div className="mt-2">[Карти гравця тут]</div>
+    <div>
+      <h3>Карти гравця</h3>
+
+      <div>
+        {cards && cards.length > 0 ? (
+          cards.map((c, i) => <span key={i}>{c} </span>)
+        ) : (
+          <p>Немає карт</p>
+        )}
+      </div>
     </div>
   );
 }
-
-export default PlayerHand;
